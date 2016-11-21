@@ -12,7 +12,7 @@ To use via Maven:
 ```
 <dependency>
     <groupId>org.hathitrust.htrc</groupId>
-    <artifactId>scala-utils.11</artifactId>
+    <artifactId>scala-utils_2.11</artifactId>
     <version>2.0-SNAPSHOT</version>
 </dependency>
 ```
