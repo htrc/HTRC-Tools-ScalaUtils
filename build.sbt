@@ -41,7 +41,7 @@ lazy val `scala-utils` = (project in file(".")).
   settings(commonSettings: _*).
   settings(
     name := "scala-utils",
-    version := "2.0",
+    version := "2.1-SNAPSHOT",
     description :=
       "A set of utility functions and routines that reduce the boilerplate needed " +
       "to accomplish some common tasks in Scala.",
