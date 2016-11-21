@@ -1,0 +1,5 @@
+/.clover/
+/.idea/
+target/
+/project/project/
+*.class
