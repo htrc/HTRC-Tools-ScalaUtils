@@ -3,7 +3,7 @@ This library provides a set of implicit transformations and routines that reduce
 
 # Build
 * To generate a package that can be referenced from other projects:  
-  `sbt test package`  
+  `sbt package`  
   then find the result in `target/scala-2.11/` (or similar) folder.
 
 # Usage
