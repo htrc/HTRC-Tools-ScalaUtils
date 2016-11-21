@@ -13,9 +13,9 @@ To use via Maven:
 <dependency>
     <groupId>org.hathitrust.htrc</groupId>
     <artifactId>scala-utils_2.11</artifactId>
-    <version>2.0</version>
+    <version>2.1-SNAPSHOT</version>
 </dependency>
 ```
 
 To use via SBT:
-`libraryDependencies += "org.hathitrust.htrc" %% "scala-utils" % "2.0"`
+`libraryDependencies += "org.hathitrust.htrc" %% "scala-utils" % "2.1-SNAPSHOT"`
