@@ -1,14 +1,14 @@
 package org.hathitrust.htrc.tools.scala.collections
 
-import scala.collection.{mutable, AbstractIterator}
+import scala.collection.{AbstractIterator, mutable}
 import scala.reflect.ClassTag
 
 /**
- * Class represents the power set of a collection of elements
- *
- * @param elements The elements
- * @tparam A The type of the elements
- */
+  * Class represents the power set of a collection of elements
+  *
+  * @param elements The elements
+  * @tparam A The type of the elements
+  */
 class PowerSet[A: ClassTag](elements: Iterable[A]) extends Iterable[Iterable[A]] {
   private val inputSize = elements.size
   require(inputSize <= 30, s"Too many elements: $inputSize > 30")
@@ -25,11 +25,13 @@ class PowerSet[A: ClassTag](elements: Iterable[A]) extends Iterable[Iterable[A]]
   }
 
   override def size: Int = 1 << inputSize
+
   override def isEmpty: Boolean = false
+
   override def nonEmpty: Boolean = true
 
   override def equals(obj: scala.Any): Boolean = obj match {
-    case other: PowerSet[A] => elementsMap.keys sameElements other.elementsMap.keys
+    case other: PowerSet[A] => elementsMap.equals(other.elementsMap)
     case _ => super.equals(obj)
   }
 
@@ -39,17 +41,17 @@ class PowerSet[A: ClassTag](elements: Iterable[A]) extends Iterable[Iterable[A]]
 }
 
 /**
- * Class defines a subset based on an bitmask representing set membership in the supplied map
- *
- * @param setMap The element map (element -> position)
- * @param bitMask The bitmask
- * @tparam A The type of the elements
- */
+  * Class defines a subset based on a bitmask representing set membership in the supplied map
+  *
+  * @param setMap  The element map (element -> position)
+  * @param bitMask The bitmask
+  * @tparam A The type of the elements
+  */
 class SubSet[+A: ClassTag](setMap: mutable.LinkedHashMap[A, Int], bitMask: Int) extends Iterable[A] {
 
   override def iterator: Iterator[A] = new AbstractIterator[A] {
-    val elements = setMap.keys.toArray
-    var setBits = bitMask
+    private val elements = setMap.keys.toArray
+    private var setBits = bitMask
 
     override def hasNext: Boolean = setBits != 0
 

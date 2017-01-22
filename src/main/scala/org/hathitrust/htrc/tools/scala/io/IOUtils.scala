@@ -4,13 +4,22 @@ import java.io.File
 
 object IOUtils {
 
-  def recurseFileTree(root: File, skipHidden: Boolean = false): Stream[File] =
-    if (!root.exists || (skipHidden && root.isHidden))
+  /**
+    * Lazily traverses a folder structure and returns all files recursively.
+    *
+    * @param root The root of the folder hierarchy to traverse
+    * @param skipHidden True to skip hidden files, False to include them
+    * @return The stream of discovered files
+    */
+  def recurseFileTree(root: File, skipHidden: Boolean = false): Stream[File] = {
+    if (!root.exists || (skipHidden && root.isHidden)) {
       Stream.empty
-    else
+    } else {
       root #:: (root.listFiles match {
         case null => Stream.empty
         case files => files.toStream.flatMap(recurseFileTree(_, skipHidden))
       })
+    }
+  }
 
 }
