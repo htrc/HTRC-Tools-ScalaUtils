@@ -4,7 +4,7 @@ git.useGitDescribe := true
 
 lazy val commonSettings = Seq(
   organization := "org.hathitrust.htrc",
-  scalaVersion := "2.11.8",
+  scalaVersion := "2.12.1",
   scalacOptions ++= Seq(
     "-feature",
     "-language:postfixOps",
@@ -47,5 +47,6 @@ lazy val `scala-utils` = (project in file(".")).
     libraryDependencies ++= Seq(
       "org.scalacheck"    %% "scalacheck"     % "1.13.4"  % "test",
       "org.scalatest"     %% "scalatest"      % "3.0.1"   % "test"
-    )
+    ),
+    crossScalaVersions := Seq("2.12.1", "2.11.8")
   )
