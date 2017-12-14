@@ -48,5 +48,5 @@ lazy val `scala-utils` = (project in file(".")).
       "org.scalacheck"    %% "scalacheck"     % "1.13.4"  % "test",
       "org.scalatest"     %% "scalatest"      % "3.0.1"   % "test"
     ),
-    crossScalaVersions := Seq("2.12.1", "2.11.8")
+    crossScalaVersions := Seq("2.12.4", "2.11.12")
   )
