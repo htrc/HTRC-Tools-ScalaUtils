@@ -16,7 +16,7 @@ object CollectionsImplicits {
     def powerSet: PowerSet[A] = new PowerSet[A](it)
   }
 
-  implicit class SeqWithGroupWhen[+A](s: Seq[A]) {
+  implicit class SeqWithGroupConsecutiveWhen[+A](s: Seq[A]) {
 
     import org.hathitrust.htrc.tools.scala.collections.RewindableIterator
 
@@ -26,7 +26,7 @@ object CollectionsImplicits {
       * @param p The predicate indicating the grouping condition.
       * @return An iterator containing the sequences of grouped elements
       */
-    def groupWhen(p: (A, A) => Boolean): Iterator[Seq[A]] = new AbstractIterator[Seq[A]] {
+    def groupConsecutiveWhen(p: (A, A) => Boolean): Iterator[Seq[A]] = new AbstractIterator[Seq[A]] {
       val (it1, it2) = s.iterator.duplicate
       val ritr = new RewindableIterator(it1, 1)
 
@@ -38,7 +38,7 @@ object CollectionsImplicits {
           case _ => false
         }).length
 
-        (it2 take (count + 1)).toSeq
+        (it2 take (count + 1)).toList
       }
     }
   }
