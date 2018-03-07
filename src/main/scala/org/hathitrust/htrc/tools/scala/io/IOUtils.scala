@@ -1,6 +1,7 @@
 package org.hathitrust.htrc.tools.scala.io
 
 import java.io.File
+import scala.language.reflectiveCalls
 
 object IOUtils {
 
