@@ -26,13 +26,13 @@ object CollectionsImplicits {
       * @param p The predicate indicating the grouping condition.
       * @return An iterator containing the sequences of grouped elements
       */
-    def groupConsecutiveWhen(p: (A, A) => Boolean): Iterator[Seq[A]] = new AbstractIterator[Seq[A]] {
+    def groupConsecutiveWhen(p: (A, A) => Boolean): Iterator[List[A]] = new AbstractIterator[List[A]] {
       val (it1, it2) = s.iterator.duplicate
       val ritr = new RewindableIterator(it1, 1)
 
       override def hasNext: Boolean = it2.hasNext
 
-      override def next(): Seq[A] = {
+      override def next(): List[A] = {
         val count = (ritr.rewind().sliding(2) takeWhile {
           case Seq(a1, a2) => p(a1, a2)
           case _ => false
@@ -52,13 +52,13 @@ object CollectionsImplicits {
       * @param p The predicate
       * @return The power set
       */
-    def powerSetWithExclusiveFilter(p: Seq[A] => Boolean): Seq[Seq[A]] = {
+    def powerSetWithExclusiveFilter(p: Seq[A] => Boolean): List[List[A]] = {
       @annotation.tailrec
-      def pwr(s: Seq[A], acc: Seq[Seq[A]]): Seq[Seq[A]] =
+      def pwr(s: Seq[A], acc: List[List[A]]): List[List[A]] =
         if (s.isEmpty) acc
         else pwr(s.tail, acc ++ acc.map(_ :+ s.head).filter(p))
 
-      pwr(s, Seq(Seq.empty[A]))
+      pwr(s, List(List.empty[A]))
     }
 
   }

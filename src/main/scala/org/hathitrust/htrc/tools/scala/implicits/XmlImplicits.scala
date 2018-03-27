@@ -36,12 +36,12 @@ object XmlImplicits {
       val tf = TransformerFactory.newInstance()
 
       val transformer = tf.newTransformer()
-      outputProperties.foreach(transformer.setOutputProperties)
+      outputProperties.foreach(transformer.setOutputProperties(_))
 
       transformer.transform(new DOMSource(document), new StreamResult(outputStream))
     }
 
-    override def toString: String = document.toString(true)(Codec.UTF8)
+    override def toString: String = toString(indent = true)(Codec.UTF8)
 
     /**
       * Returns a string representation of this XML document
@@ -53,7 +53,7 @@ object XmlImplicits {
     def toString(indent: Boolean)(implicit codec: Codec): String = {
       val sw = new StringWriter()
 
-      implicit val outputProperties = Some(new Properties())
+      implicit val outputProperties: Some[Properties] = Some(new Properties())
       outputProperties.foreach { props =>
         props.setProperty(OutputKeys.INDENT, if (indent) "yes" else "no")
         props.setProperty(OutputKeys.ENCODING, codec.name)
@@ -74,7 +74,7 @@ object XmlImplicits {
       val tf = TransformerFactory.newInstance()
 
       val transformer = tf.newTransformer()
-      outputProperties.foreach(transformer.setOutputProperties)
+      outputProperties.foreach(transformer.setOutputProperties(_))
 
       transformer.transform(new DOMSource(document), new StreamResult(writer))
     }
