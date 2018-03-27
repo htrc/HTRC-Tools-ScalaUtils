@@ -1,14 +1,20 @@
 package org.hathitrust.htrc.tools.scala.io
 
-import java.io.File
+import java.io.{File, InputStream, OutputStream}
+import java.nio.file.attribute.FileAttribute
+import java.nio.file.{Files, Path, Paths, StandardOpenOption}
+
 import scala.language.reflectiveCalls
+import scala.util.Try
 
 object IOUtils {
+  val OSTmpDir: String = System.getProperty("java.io.tmpdir")
+  private val BUFFER_SIZE = 16384
 
   /**
     * Lazily traverses a folder structure and returns all files recursively.
     *
-    * @param root The root of the folder hierarchy to traverse
+    * @param root       The root of the folder hierarchy to traverse
     * @param skipHidden True to skip hidden files, False to include them
     * @return The stream of discovered files
     */
@@ -30,5 +36,33 @@ object IOUtils {
     finally {
       closeable.close()
     }
+
+  def copy(source: InputStream, sink: OutputStream): Try[Long] = Try {
+    val buf = new Array[Byte](BUFFER_SIZE)
+    var numRead = 0L
+    var n = source.read(buf)
+    while (n > 0) {
+      sink.write(buf, 0, n)
+      numRead += n
+      n = source.read(buf)
+    }
+
+    numRead
+  }
+
+  def saveToTempFile(is: InputStream,
+                     prefix: String = null,
+                     suffix: String = null,
+                     tmpDir: String = OSTmpDir,
+                     fileAttributes: List[FileAttribute[_]] = Nil): Try[Path] = Try {
+    val tmpPath = Paths.get(tmpDir)
+    val tmpFile = Files.createTempFile(tmpPath, prefix, suffix, fileAttributes: _*)
+
+    using(Files.newOutputStream(tmpFile, StandardOpenOption.WRITE)) { tmpStream =>
+      copy(is, tmpStream)
+    }
+
+    tmpFile
+  }
 
 }

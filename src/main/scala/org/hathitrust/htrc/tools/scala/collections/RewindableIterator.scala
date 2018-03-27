@@ -7,11 +7,11 @@ object RewindableIterator {
 /**
   * Provides an iterator that remembers the last `remember` values
   *
-  * @param it       The iterator to wrap
+  * @param underlying       The iterator to wrap
   * @param remember The number of items to remember
   * @tparam A The type parameter of the wrapped iterator
   */
-class RewindableIterator[A](it: Iterator[A], remember: Int) extends Iterator[A] {
+class RewindableIterator[A](underlying: Iterator[A], remember: Int) extends Iterator[A] {
   private var memory = List.empty[A]
   private var memoryIndex = 0
 
@@ -21,7 +21,7 @@ class RewindableIterator[A](it: Iterator[A], remember: Int) extends Iterator[A] 
       memoryIndex += 1
       next
     } else {
-      val next = it.next()
+      val next = underlying.next()
       memory = memory :+ next
       if (memory.length > remember)
         memory = memory drop 1
@@ -60,5 +60,5 @@ class RewindableIterator[A](it: Iterator[A], remember: Int) extends Iterator[A] 
     this
   }
 
-  override def hasNext: Boolean = it.hasNext
+  override def hasNext: Boolean = underlying.hasNext
 }
