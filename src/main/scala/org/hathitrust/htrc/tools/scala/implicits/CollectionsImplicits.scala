@@ -2,8 +2,10 @@ package org.hathitrust.htrc.tools.scala.implicits
 
 import org.hathitrust.htrc.tools.scala.collections.PowerSet
 
-import scala.collection.AbstractIterator
+import scala.collection.generic.CanBuildFrom
+import scala.collection.{AbstractIterator, IterableLike}
 import scala.reflect.ClassTag
+import scala.language.higherKinds
 
 object CollectionsImplicits {
 
@@ -16,8 +18,7 @@ object CollectionsImplicits {
     def powerSet: PowerSet[A] = new PowerSet[A](it)
   }
 
-  implicit class SeqWithGroupConsecutiveWhen[+A](s: Seq[A]) {
-
+  implicit class IteratorWithGroupConsecutiveWhen[+A: ClassTag](s: Iterator[A]) {
     import org.hathitrust.htrc.tools.scala.collections.RewindableIterator
 
     /**
@@ -27,8 +28,8 @@ object CollectionsImplicits {
       * @return An iterator containing the sequences of grouped elements
       */
     def groupConsecutiveWhen(p: (A, A) => Boolean): Iterator[List[A]] = new AbstractIterator[List[A]] {
-      val (it1, it2) = s.iterator.duplicate
-      val ritr = new RewindableIterator(it1, 1)
+      private val (it1, it2) = s.duplicate
+      private val ritr = new RewindableIterator(it1, 1)
 
       override def hasNext: Boolean = it2.hasNext
 
@@ -40,6 +41,42 @@ object CollectionsImplicits {
 
         (it2 take (count + 1)).toList
       }
+    }
+  }
+
+  implicit class IterableWithGroupConsecutiveWhen[A: ClassTag, C[X] <: IterableLike[X, C[X]]](s: C[A])(implicit cbf: CanBuildFrom[C[A], List[A], C[List[A]]]) {
+
+    import org.hathitrust.htrc.tools.scala.collections.RewindableIterator
+
+    /**
+      * Groups consecutive elements that match the given predicate.
+      *
+      * @param p The predicate indicating the grouping condition.
+      * @return An `IterableLike` containing the sequences of grouped elements
+      */
+    def groupConsecutiveWhen(p: (A, A) => Boolean): C[List[A]] = {
+      val it = new AbstractIterator[List[A]] {
+        private val it1 = s.iterator
+        private val it2 = s.iterator
+        private val ritr = new RewindableIterator(it1, 1)
+
+        override def hasNext: Boolean = it2.hasNext
+
+        override def next(): List[A] = {
+          val count = (ritr.rewind().sliding(2) takeWhile {
+            case Seq(a1, a2) => p(a1, a2)
+            case _ => false
+          }).length
+
+          (it2 take (count + 1)).toList
+        }
+      }
+
+      val bf = cbf(s)
+      while (it.hasNext)
+        bf += it.next()
+
+      bf.result()
     }
   }
 
