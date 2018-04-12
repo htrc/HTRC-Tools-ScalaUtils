@@ -7,13 +7,9 @@ lazy val commonSettings = Seq(
   scalaVersion := "2.12.5",
   scalacOptions ++= Seq(
     "-feature",
+    "-deprecation",
     "-language:postfixOps",
-    "-language:implicitConversions",
-    "-target:jvm-1.7"
-  ),
-  javacOptions ++= Seq(
-    "-source", "1.7",
-    "-target", "1.7"
+    "-language:implicitConversions"
   ),
   resolvers ++= Seq(
     "I3 Repository" at "http://nexus.htrc.illinois.edu/content/groups/public",
@@ -33,7 +29,14 @@ lazy val commonSettings = Seq(
     ("Git-Version", git.gitDescribedVersion.value.getOrElse("N/A")),
     ("Git-Dirty", git.gitUncommittedChanges.value.toString),
     ("Build-Date", new java.util.Date().toString)
-  )
+  ),
+  wartremoverErrors ++= Warts.unsafe.diff(Seq(
+    Wart.DefaultArguments,
+    Wart.NonUnitStatements
+  )),
+  // force to run 'test' before 'package' and 'publish' tasks
+  publish := (publish dependsOn Test / test).value,
+  Keys.`package` := (Compile / Keys.`package` dependsOn Test / test).value
 )
 
 lazy val `scala-utils` = (project in file(".")).
@@ -45,7 +48,7 @@ lazy val `scala-utils` = (project in file(".")).
       "A set of utility functions and routines that reduce the boilerplate needed " +
       "to accomplish some common tasks in Scala.",
     libraryDependencies ++= Seq(
-      "org.scalacheck"    %% "scalacheck"     % "1.13.4"  % "test",
+      "org.scalacheck"    %% "scalacheck"     % "1.13.5"  % "test",
       "org.scalatest"     %% "scalatest"      % "3.0.5"   % "test"
     ),
     crossScalaVersions := Seq("2.12.5", "2.11.12")
