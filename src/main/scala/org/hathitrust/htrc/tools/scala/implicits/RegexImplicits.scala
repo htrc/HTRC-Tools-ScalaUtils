@@ -10,11 +10,7 @@ object RegexImplicits {
       *
       * @return The number of matches
       */
-    def findCount: Int = {
-      var count = 0
-      while (matcher.find()) count += 1
-      count
-    }
+    def findCount: Int = Iterator.continually(matcher.find()).takeWhile(identity).size
   }
 
 }

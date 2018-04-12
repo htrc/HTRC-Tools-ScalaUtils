@@ -49,6 +49,7 @@ class PowerSet[A: ClassTag](elements: Iterable[A]) extends Iterable[Iterable[A]]
   */
 class SubSet[+A: ClassTag](setMap: mutable.LinkedHashMap[A, Int], bitMask: Int) extends Iterable[A] {
 
+  @SuppressWarnings(Array("org.wartremover.warts.Var"))
   override def iterator: Iterator[A] = new AbstractIterator[A] {
     private val elements = setMap.keys.toArray
     private var setBits = bitMask
@@ -56,8 +57,8 @@ class SubSet[+A: ClassTag](setMap: mutable.LinkedHashMap[A, Int], bitMask: Int) 
     override def hasNext: Boolean = setBits != 0
 
     override def next(): A = {
+      require(hasNext, "hasNext must be true")
       val index = Integer.numberOfTrailingZeros(setBits)
-      if (index == 32) throw new NoSuchElementException
       setBits &= ~(1 << index)
       elements(index)
     }

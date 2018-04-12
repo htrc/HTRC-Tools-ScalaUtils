@@ -89,6 +89,7 @@ object CollectionsImplicits {
       * @param p The predicate
       * @return The power set
       */
+    @SuppressWarnings(Array("org.wartremover.warts.TraversableOps"))
     def powerSetWithExclusiveFilter(p: Seq[A] => Boolean): List[List[A]] = {
       @annotation.tailrec
       def pwr(s: Seq[A], acc: List[List[A]]): List[List[A]] =
@@ -107,6 +108,7 @@ object CollectionsImplicits {
       * @param cmp Function comparing two elements to determine their monotonicity
       * @return True if monotonic, False otherwise
       */
+    @SuppressWarnings(Array("org.wartremover.warts.Var"))
     def isMonotonic(cmp: (A, A) => Boolean): Boolean = {
       import scala.util.control.Breaks._
 
@@ -132,6 +134,7 @@ object CollectionsImplicits {
       * @param s1 The other sequence
       * @return The Levenshtein distance
       */
+    @SuppressWarnings(Array("org.wartremover.warts.Return", "org.wartremover.warts.Var"))
     def levenshteinScore(s1: Seq[A]): Double = {
       if (s0 == s1) return 0
 
