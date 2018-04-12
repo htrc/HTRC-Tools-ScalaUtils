@@ -36,7 +36,6 @@ object SqlImplicits {
 
 }
 
-
 object RichSQL {
 
   import java.sql._
@@ -85,6 +84,7 @@ object RichSQL {
     *
     * @param rs The wrapped ResultSet object
     */
+  @SuppressWarnings(scala.Array("org.wartremover.warts.Var"))
   class RichResultSet(val rs: ResultSet) {
 
     private var pos = 1
@@ -206,6 +206,7 @@ object RichSQL {
   implicit def rich2St(rs: RichStatement): Statement = rs.s
 
 
+  @SuppressWarnings(scala.Array("org.wartremover.warts.Var"))
   class RichPreparedStatement(val ps: PreparedStatement) {
     private var pos = 1
 

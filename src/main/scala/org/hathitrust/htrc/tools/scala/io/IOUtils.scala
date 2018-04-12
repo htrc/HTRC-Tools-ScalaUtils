@@ -18,6 +18,7 @@ object IOUtils {
     * @param skipHidden True to skip hidden files, False to include them
     * @return The stream of discovered files
     */
+  @SuppressWarnings(Array("org.wartremover.warts.Null"))
   def recurseFileTree(root: File, skipHidden: Boolean = false): Stream[File] = {
     if (!root.exists || (skipHidden && root.isHidden)) {
       Stream.empty
@@ -37,6 +38,7 @@ object IOUtils {
       closeable.close()
     }
 
+  @SuppressWarnings(Array("org.wartremover.warts.Var"))
   def copy(source: InputStream, sink: OutputStream): Try[Long] = Try {
     val buf = new Array[Byte](BUFFER_SIZE)
     var numRead = 0L
@@ -50,6 +52,7 @@ object IOUtils {
     numRead
   }
 
+  @SuppressWarnings(Array("org.wartremover.warts.Null"))
   def saveToTempFile(is: InputStream,
                      prefix: String = null,
                      suffix: String = null,

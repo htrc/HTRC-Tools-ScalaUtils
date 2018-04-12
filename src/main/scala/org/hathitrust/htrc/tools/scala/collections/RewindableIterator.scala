@@ -1,7 +1,10 @@
 package org.hathitrust.htrc.tools.scala.collections
 
+import scala.reflect.ClassTag
+
 object RewindableIterator {
-  def apply[A](it: Iterator[A], remember: Int) = new RewindableIterator(it, remember)
+  def apply[A: ClassTag](it: Iterator[A], remember: Int): RewindableIterator[A] =
+    new RewindableIterator(it, remember)
 }
 
 /**
@@ -11,23 +14,33 @@ object RewindableIterator {
   * @param remember The number of items to remember
   * @tparam A The type parameter of the wrapped iterator
   */
-class RewindableIterator[A](underlying: Iterator[A], remember: Int) extends Iterator[A] {
-  private var memory = List.empty[A]
-  private var memoryIndex = 0
+@SuppressWarnings(Array("org.wartremover.warts.Var"))
+class RewindableIterator[A: ClassTag](underlying: Iterator[A], remember: Int) extends Iterator[A] {
+  require(remember >= 0)
 
-  override def next(): A = {
-    if (memoryIndex < memory.length) {
+  private val memory = Array.ofDim[A](remember)
+  private var index = 0
+  private var memoryStart = 0
+  private var numRemembered = 0
+
+  override def next(): A = index match {
+    case _ if index < numRemembered =>
+      val memoryIndex = (memoryStart + index) % remember
       val next = memory(memoryIndex)
-      memoryIndex += 1
+      index += 1
       next
-    } else {
+
+    case _ if remember > 0 =>
       val next = underlying.next()
-      memory = memory :+ next
-      if (memory.length > remember)
-        memory = memory drop 1
-      memoryIndex = memory.length
+      val i = (memoryStart + numRemembered) % remember
+      memory(i) = next
+      if (numRemembered == remember)
+        memoryStart = (memoryStart + 1) % remember
+      else numRemembered += 1
+      index = numRemembered
       next
-    }
+
+    case _ => underlying.next()
   }
 
   /**
@@ -36,7 +49,7 @@ class RewindableIterator[A](underlying: Iterator[A], remember: Int) extends Iter
     * @param n The number of items to go back
     * @return True if the iterator can be rewound, False otherwise
     */
-  def canRewind(n: Int): Boolean = memoryIndex - n >= 0
+  def canRewind(n: Int): Boolean = index - n >= 0
 
   /**
     * Rewind the iterator by going back a specified number of items
@@ -45,8 +58,8 @@ class RewindableIterator[A](underlying: Iterator[A], remember: Int) extends Iter
     * @return This iterator, for continuations
     */
   def rewind(n: Int): RewindableIterator[A] = {
-    require(memoryIndex - n >= 0, "Attempted to rewind past 'remember' limit")
-    memoryIndex -= n
+    require(index - n >= 0, "Attempted to rewind past 'remember' limit")
+    index -= n
     this
   }
 
@@ -56,9 +69,9 @@ class RewindableIterator[A](underlying: Iterator[A], remember: Int) extends Iter
     * @return This iterator, for continuations
     */
   def rewind(): RewindableIterator[A] = {
-    memoryIndex = 0
+    index = 0
     this
   }
 
-  override def hasNext: Boolean = underlying.hasNext
+  override def hasNext: Boolean = index < numRemembered || underlying.hasNext
 }

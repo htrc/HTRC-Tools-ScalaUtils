@@ -9,10 +9,11 @@ import scala.collection.AbstractIterator
   * @tparam A The type parameter
   */
 abstract class AbstractIndexedIterator[+A](override val size: Int) extends AbstractIterator[A] {
+  @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private var position = 0
 
   override def next(): A = {
-    if (!hasNext) throw new NoSuchElementException
+    require(hasNext, "hasNext must be true")
     val res = get(position)
     position += 1
     res

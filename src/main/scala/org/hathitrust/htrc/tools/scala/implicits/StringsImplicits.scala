@@ -12,7 +12,7 @@ object StringsImplicits {
       * @return A regex interpolator that can be used for extracting regex matches
       */
     def r: scala.util.matching.Regex =
-      new util.matching.Regex(sc.parts.mkString, sc.parts.tail.map(_ => "x"): _*)
+      new util.matching.Regex(sc.parts.mkString, sc.parts.drop(1).map(_ => "x"): _*)
   }
 
   implicit class StringEx(s: String) {
@@ -32,7 +32,7 @@ object StringsImplicits {
       * @return The quoted string
       */
     def quoted(quoteChar: Char = '"'): String = {
-      val s2 = s.replaceAllLiterally(quoteChar.toString, """\""" + quoteChar)
+      val s2 = s.replaceAllLiterally(quoteChar.toString, """\""" + quoteChar.toString)
       s"$quoteChar$s2$quoteChar"
     }
 
