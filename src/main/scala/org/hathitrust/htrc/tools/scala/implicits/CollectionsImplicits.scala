@@ -1,9 +1,9 @@
 package org.hathitrust.htrc.tools.scala.implicits
 
-import org.hathitrust.htrc.tools.scala.collections.PowerSet
+import org.hathitrust.htrc.tools.scala.collections.{EndOfLineDehyphenator, PowerSet}
 
 import scala.collection.generic.CanBuildFrom
-import scala.collection.{AbstractIterator, IterableLike}
+import scala.collection.{AbstractIterator, IterableLike, SeqLike}
 import scala.reflect.ClassTag
 import scala.language.higherKinds
 
@@ -44,7 +44,39 @@ object CollectionsImplicits {
     }
   }
 
-  implicit class IterableWithGroupConsecutiveWhen[A: ClassTag, C[X] <: IterableLike[X, C[X]]](s: C[A])(implicit cbf: CanBuildFrom[C[A], List[A], C[List[A]]]) {
+  implicit class IteratorWithDehyphenate(s: Iterator[String]) {
+    /**
+      * Dehyphenates a set of lines of text (i.e. joins end-of-line hyphenated words)
+      * Loosely follows the rules specified at http://englishplus.com/grammar/00000129.htm
+      *
+      * @param allowedHyphenChars The allowed hyphen characters (used for determining when a word
+      *                           is hyphenated or not) (Technical note: these are added to a regular
+      *                           expression, so take care to escape things if necessary)
+      * @return An iterator over the dehyphenated lines
+      */
+    def dehyphenate(allowedHyphenChars: String = "-‐‑‒–―−"): Iterator[String] =
+      new EndOfLineDehyphenator(s, allowedHyphenChars)
+  }
+
+  implicit class SeqWithDehyphenate[C <: SeqLike[String, C]](s: C) {
+    /**
+      * Dehyphenates a set of lines of text (i.e. joins end-of-line hyphenated words)
+      * Loosely follows the rules specified at http://englishplus.com/grammar/00000129.htm
+      *
+      * @param allowedHyphenChars The allowed hyphen characters (used for determining when a word
+      *                           is hyphenated or not) (Technical note: these are added to a regular
+      *                           expression, so take care to escape things if necessary)
+      * @return The dehyphenated lines
+      */
+    def dehyphenate(allowedHyphenChars: String = "-‐‑‒–―−")
+                   (implicit cbf: CanBuildFrom[C, String, C]): C = {
+      val bf = cbf(s)
+      for (x <- new EndOfLineDehyphenator(s.iterator, allowedHyphenChars)) bf += x
+      bf.result()
+    }
+  }
+
+  implicit class IterableWithGroupConsecutiveWhen[A: ClassTag, C[X] <: IterableLike[X, C[X]]](s: C[A]) {
 
     import org.hathitrust.htrc.tools.scala.collections.RewindableIterator
 
@@ -54,7 +86,8 @@ object CollectionsImplicits {
       * @param p The predicate indicating the grouping condition.
       * @return An `IterableLike` containing the sequences of grouped elements
       */
-    def groupConsecutiveWhen(p: (A, A) => Boolean): C[List[A]] = {
+    def groupConsecutiveWhen(p: (A, A) => Boolean)
+                            (implicit cbf: CanBuildFrom[C[A], List[A], C[List[A]]]): C[List[A]] = {
       val it = new AbstractIterator[List[A]] {
         private val it1 = s.iterator
         private val it2 = s.iterator

@@ -1,12 +1,11 @@
 package org.hathitrust.htrc.tools.scala.implicits
 
-import org.scalatest.{FlatSpec, ParallelTestExecution}
+import org.scalatest.{FlatSpec, Matchers, ParallelTestExecution}
 import org.scalatest.prop.PropertyChecks
 import CollectionsImplicits._
-import org.scalatest.Matchers._
 
 class GroupConsecutiveWhenSpec extends FlatSpec
-  with PropertyChecks with ParallelTestExecution {
+  with PropertyChecks with Matchers with ParallelTestExecution {
 
   "IterableGroupConsecutiveWhen" should "group consecutive elements according to the predicate" in {
     val elems = List(0,3,6,7,8,9,14,18,19,24,29,31,35,36,37,38,41)
