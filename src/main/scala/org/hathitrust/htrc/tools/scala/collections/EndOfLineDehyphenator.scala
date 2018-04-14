@@ -26,32 +26,40 @@ class EndOfLineDehyphenator(lines: Iterator[String], allowedHyphenChars: String 
     *
     * @param l1 Line 1
     * @param l2 Line 2
-    * @return The resulting lines after dehyphenation was performed, or the original lines if
+    * @return A `Some` containing the resulting lines after dehyphenation was performed, or `None` if
     *         no dehyphenation was necessary
     */
-  protected def dehyphenate(l1: String, l2: String): (String, String) = {
+  protected def dehyphenate(l1: String, l2: String): Option[(String, String)] = {
     hyphenLeftRegex.findFirstMatchIn(l1).map(_.group(1)) match {
-      case None => (l1, l2)
+      case None => None
       case Some(left) =>
         hyphenRightRegex.findFirstMatchIn(l2).map(m => m.group(1) -> m.group(2).length) match {
-          case None => (l1, l2)
-          case Some((right, numSpaces)) => (left concat right, l2.substring(right.length + numSpaces))
+          case None => None
+          case Some((right, numSpaces)) =>
+            Some((left concat right, l2.substring(right.length + numSpaces)))
         }
     }
   }
 
   override def hasNext: Boolean = linePairs.hasNext || lastLine.nonEmpty
 
-  @SuppressWarnings(Array("org.wartremover.warts.TraversableOps", "org.wartremover.warts.Throw"))
+  @SuppressWarnings(Array("org.wartremover.warts.TraversableOps", "org.wartremover.warts.Var", "org.wartremover.warts.Throw"))
   override def next(): String = {
     if (linePairs.hasNext) {
       linePairs.next() match {
         case _l1 :: _l2 :: Nil =>
-          val (l1, l2) = dehyphenate(lastLine.getOrElse(_l1), _l2)
-          lastLine = Some(l2).filter(_.nonEmpty) orElse {
-            if (linePairs.hasNext)
-              Some(linePairs.next().last)
-            else None
+          var l1 = lastLine.getOrElse(_l1)
+          dehyphenate(l1, _l2) match {
+            case Some((l1_, l2_)) =>
+              l1 = l1_
+              lastLine = Some(l2_).filter(_.nonEmpty) orElse {
+                if (linePairs.hasNext)
+                  Some(linePairs.next().last)
+                else None
+              }
+
+            case None =>
+              lastLine = Some(_l2)
           }
 
           l1

@@ -9,8 +9,8 @@ import scala.io.Source
 // TODO write better tests -- these were just quick-and-dirty
 class EndOfLineDehyphenatorSpec extends FlatSpec
   with PropertyChecks with Matchers {
-  private val text = "This is the be-\nginning of a one-of-a-\nkind friendship between ape and hu-\nman.\n   We should always cheer\nfor our best-\nin-class companion animal!\nThis text makes no sense and is con-\ntrieved to test this fea-\nture."
-  private val expected = "This is the beginning\nof a one-of-a-\nkind friendship between ape and human.\n   We should always cheer\nfor our best-\nin-class companion animal!\nThis text makes no sense and is contrieved\nto test this feature."
+  private val text = "The title.\n\n\nThis is the be-\nginning of a one-of-a-\nkind friendship between ape and hu-\nman.\n   We should always cheer\nfor our best-\nin-class companion animal!\nThis text makes no sense and is con-\ntrieved to test this fea-\nture."
+  private val expected = "The title.\n\n\nThis is the beginning\nof a one-of-a-\nkind friendship between ape and human.\n   We should always cheer\nfor our best-\nin-class companion animal!\nThis text makes no sense and is contrieved\nto test this feature."
 
   "EnfOfLineDehyphenator" should "correctly dehyphenate some sample text" in {
     val it = Source.fromString(text).getLines
