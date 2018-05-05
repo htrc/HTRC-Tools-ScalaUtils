@@ -22,7 +22,7 @@ lazy val commonSettings = Seq(
     else
       Some("HTRC Releases Repository"  at nexus + "content/repositories/releases")
   },
-  credentials += Credentials(Path.userHome / ".ivy2" / ".credentials"),
+  credentials += Credentials(Path.userHome / ".ivy2" / ".credentials" / "nexus.htrc.illinois.edu"),
   packageOptions in (Compile, packageBin) += Package.ManifestAttributes(
     ("Git-Sha", git.gitHeadCommit.value.getOrElse("N/A")),
     ("Git-Branch", git.gitCurrentBranch.value),
