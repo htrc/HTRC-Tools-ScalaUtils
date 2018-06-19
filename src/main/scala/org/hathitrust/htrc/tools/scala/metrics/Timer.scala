@@ -9,6 +9,7 @@ object Timer {
     * @tparam R The type of the result returned by the code block
     * @return The result of running the code block
     */
+  @SuppressWarnings(Array("org.wartremover.warts.Any"))
   def printElapsedTime[R](name: String)(block: => R): R = {
     val t0 = System.currentTimeMillis()
     val result = block
