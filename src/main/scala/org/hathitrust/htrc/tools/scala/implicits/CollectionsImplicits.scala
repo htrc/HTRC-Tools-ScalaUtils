@@ -230,4 +230,33 @@ object CollectionsImplicits {
     }
   }
 
+  implicit class TraversableOnceEx[A](t: TraversableOnce[A]) {
+    /**
+      * Same as `maxBy` but guards against using maxBy on an empty collection
+      *
+      * @param f The measuring function
+      * @param cmp An ordering used when comparing elements
+      * @tparam B The result type of the function f
+      * @return An Option containing the first element of this collection or iterator with the largest value
+      *         measured by function f with respect to the ordering cmp, or None if this collection or iterator is empty
+      */
+    def maxByOpt[B](f: A => B)(implicit cmp: Ordering[B]): Option[A] = t match {
+      case _ if t.isEmpty => None
+      case _ => Some(t.maxBy(f)(cmp))
+    }
+
+    /**
+      * Same as `minBy` but guards against using minBy on an empty collection
+      *
+      * @param f The measuring function
+      * @param cmp An ordering used when comparing elements
+      * @tparam B The result type of the function f
+      * @return An Option containing the first element of this collection or iterator with the smallest value
+      *         measured by function f with respect to the ordering cmp, or None if this collection or iterator is empty
+      */
+    def minByOpt[B](f: A => B)(implicit cmp: Ordering[B]): Option[A] = t match {
+      case _ if t.isEmpty => None
+      case _ => Some(t.minBy(f)(cmp))
+    }
+  }
 }
