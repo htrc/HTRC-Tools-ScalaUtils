@@ -50,8 +50,8 @@ lazy val `scala-utils` = (project in file("."))
       "A set of utility functions and routines that reduce the boilerplate needed " +
       "to accomplish some common tasks in Scala.",
     libraryDependencies ++= Seq(
-      "org.scalacheck"    %% "scalacheck"     % "1.14.0"  % "test",
-      "org.scalatest"     %% "scalatest"      % "3.0.8"   % "test"
+      "org.scalacheck"    %% "scalacheck"     % "1.14.0"  % Test,
+      "org.scalatest"     %% "scalatest"      % "3.0.8"   % Test
     ),
     crossScalaVersions := Seq("2.12.9", "2.11.12")
   )
