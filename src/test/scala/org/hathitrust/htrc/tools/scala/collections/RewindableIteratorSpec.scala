@@ -2,14 +2,14 @@ package org.hathitrust.htrc.tools.scala.collections
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
-import org.scalatest.prop.PropertyChecks
 import org.scalatest.{FlatSpec, Matchers}
+import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 import scala.util.Random
 
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
 class RewindableIteratorSpec extends FlatSpec
-  with PropertyChecks with Matchers {
+  with ScalaCheckPropertyChecks with Matchers {
 
   def consume[T](it: Iterator[T], n: Int): List[T] =
     Iterator.range(0, n).map(_ => it.next()).toList

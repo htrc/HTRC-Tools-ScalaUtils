@@ -1,5 +1,7 @@
 logLevel := Level.Warn
 
-addSbtPlugin("com.typesafe.sbt" % "sbt-git" % "0.9.3")
-addSbtPlugin("com.eed3si9n" % "sbt-assembly" % "0.14.6")
-addSbtPlugin("org.wartremover" % "sbt-wartremover" % "2.2.1")
+addSbtPlugin("com.typesafe.sbt"       % "sbt-git"             % "1.0.0")
+addSbtPlugin("com.typesafe.sbt"       % "sbt-native-packager" % "1.3.25")
+addSbtPlugin("com.eed3si9n"           % "sbt-assembly"        % "0.14.10")
+addSbtPlugin("org.wartremover"        % "sbt-wartremover"     % "2.4.2")
+addSbtPlugin("com.jsuereth"           % "sbt-pgp"             % "1.1.2")
