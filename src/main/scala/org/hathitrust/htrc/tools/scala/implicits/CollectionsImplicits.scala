@@ -88,7 +88,7 @@ object CollectionsImplicits {
       */
     def groupConsecutiveWhen(p: (A, A) => Boolean)
                             (implicit cbf: CanBuildFrom[C[A], List[A], C[List[A]]]): C[List[A]] = {
-      val it = new AbstractIterator[List[A]] {
+      val it: AbstractIterator[List[A]] = new AbstractIterator[List[A]] {
         private val it1 = s.iterator
         private val it2 = s.iterator
         private val ritr = new RewindableIterator(it1, 1)
