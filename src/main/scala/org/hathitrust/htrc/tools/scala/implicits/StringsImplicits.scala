@@ -1,5 +1,7 @@
 package org.hathitrust.htrc.tools.scala.implicits
 
+import java.util.StringTokenizer
+
 import org.hathitrust.htrc.tools.java.metrics.StringMetrics
 
 object StringsImplicits {
@@ -50,6 +52,18 @@ object StringsImplicits {
       } else {
         s
       }
+    }
+
+    /**
+      * Tokenizes a string around the specified delimiters.
+      * The delimiters are not returned as tokens.
+      *
+      * @param delim The delimiters
+      * @return The tokens found
+      */
+    def tokenize(delim: String): Iterator[String] = {
+      val st = new StringTokenizer(s, delim)
+      Iterator.continually(st).takeWhile(_.hasMoreTokens).map(_.nextToken())
     }
 
   }

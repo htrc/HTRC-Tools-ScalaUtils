@@ -4,8 +4,8 @@ import org.hathitrust.htrc.tools.scala.collections.{EndOfLineDehyphenator, Power
 
 import scala.collection.generic.CanBuildFrom
 import scala.collection.{AbstractIterator, IterableLike, SeqLike}
-import scala.reflect.ClassTag
 import scala.language.higherKinds
+import scala.reflect.ClassTag
 
 object CollectionsImplicits {
 
@@ -88,7 +88,7 @@ object CollectionsImplicits {
       */
     def groupConsecutiveWhen(p: (A, A) => Boolean)
                             (implicit cbf: CanBuildFrom[C[A], List[A], C[List[A]]]): C[List[A]] = {
-      val it = new AbstractIterator[List[A]] {
+      val it: AbstractIterator[List[A]] = new AbstractIterator[List[A]] {
         private val it1 = s.iterator
         private val it2 = s.iterator
         private val ritr = new RewindableIterator(it1, 1)
@@ -142,22 +142,11 @@ object CollectionsImplicits {
       * @return True if monotonic, False otherwise
       */
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
-    def isMonotonic(cmp: (A, A) => Boolean): Boolean = {
-      import scala.util.control.Breaks._
-
-      var last: Option[A] = None
-      var result = false
-
-      breakable {
-        for (e <- seq) {
-          last.filterNot(l => cmp(l, e)).foreach(_ => break())
-          last = Some(e)
-        }
-        result = true
+    def isMonotonic(cmp: (A, A) => Boolean): Boolean =
+      seq.sliding(2).forall {
+        case x::y::Nil => cmp(x, y)
+        case _ => true
       }
-
-      result
-    }
   }
 
   implicit class SeqWithLevenshtein[-A](s0: Seq[A]) {

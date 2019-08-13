@@ -4,16 +4,26 @@ git.useGitDescribe := true
 
 lazy val commonSettings = Seq(
   organization := "org.hathitrust.htrc",
-  scalaVersion := "2.12.6",
+  organizationName := "HathiTrust Research Center",
+  organizationHomepage := Some(url("https://www.hathitrust.org/htrc")),
+  scalaVersion := "2.12.9",
   scalacOptions ++= Seq(
     "-feature",
     "-deprecation",
     "-language:postfixOps",
     "-language:implicitConversions"
   ),
-  resolvers ++= Seq(
-    "I3 Repository" at "http://nexus.htrc.illinois.edu/content/groups/public",
-    Resolver.mavenLocal
+  externalResolvers ++= Seq(
+    Resolver.defaultLocal,
+    Resolver.mavenLocal,
+    "HTRC Nexus Repository" at "http://nexus.htrc.illinois.edu/content/groups/public"
+  ),
+  packageOptions in (Compile, packageBin) += Package.ManifestAttributes(
+    ("Git-Sha", git.gitHeadCommit.value.getOrElse("N/A")),
+    ("Git-Branch", git.gitCurrentBranch.value),
+    ("Git-Version", git.gitDescribedVersion.value.getOrElse("N/A")),
+    ("Git-Dirty", git.gitUncommittedChanges.value.toString),
+    ("Build-Date", new java.util.Date().toString)
   ),
   publishTo := {
     val nexus = "https://nexus.htrc.illinois.edu/"
@@ -22,14 +32,6 @@ lazy val commonSettings = Seq(
     else
       Some("HTRC Releases Repository"  at nexus + "content/repositories/releases")
   },
-  credentials += Credentials(Path.userHome / ".ivy2" / ".credentials" / "nexus.htrc.illinois.edu"),
-  packageOptions in (Compile, packageBin) += Package.ManifestAttributes(
-    ("Git-Sha", git.gitHeadCommit.value.getOrElse("N/A")),
-    ("Git-Branch", git.gitCurrentBranch.value),
-    ("Git-Version", git.gitDescribedVersion.value.getOrElse("N/A")),
-    ("Git-Dirty", git.gitUncommittedChanges.value.toString),
-    ("Build-Date", new java.util.Date().toString)
-  ),
   wartremoverErrors ++= Warts.unsafe.diff(Seq(
     Wart.DefaultArguments,
     Wart.NonUnitStatements
@@ -39,17 +41,17 @@ lazy val commonSettings = Seq(
   Keys.`package` := (Compile / Keys.`package` dependsOn Test / test).value
 )
 
-lazy val `scala-utils` = (project in file(".")).
-  enablePlugins(GitVersioning, GitBranchPrompt).
-  settings(commonSettings: _*).
-  settings(
+lazy val `scala-utils` = (project in file("."))
+  .enablePlugins(GitVersioning, GitBranchPrompt)
+  .settings(commonSettings)
+  .settings(
     name := "scala-utils",
     description :=
       "A set of utility functions and routines that reduce the boilerplate needed " +
       "to accomplish some common tasks in Scala.",
     libraryDependencies ++= Seq(
       "org.scalacheck"    %% "scalacheck"     % "1.14.0"  % "test",
-      "org.scalatest"     %% "scalatest"      % "3.0.5"   % "test"
+      "org.scalatest"     %% "scalatest"      % "3.0.8"   % "test"
     ),
-    crossScalaVersions := Seq("2.12.6", "2.11.12")
+    crossScalaVersions := Seq("2.12.9", "2.11.12")
   )
