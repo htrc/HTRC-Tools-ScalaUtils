@@ -30,12 +30,21 @@ object IOUtils {
     }
   }
 
+  /**
+    * Manages the automated closing of resources
+    *
+    * @param closeable The closeable resource to manage
+    * @param f Code block to execute once the resource is available
+    * @tparam A Code block return type
+    * @tparam B Managed resource type
+    * @return The result of applying the code block to the resource
+    */
   def using[A, B <: {def close() : Unit}](closeable: B)(f: B => A): A =
     try {
       f(closeable)
     }
     finally {
-      closeable.close()
+      Try(closeable.close())
     }
 
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
