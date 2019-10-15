@@ -1,6 +1,5 @@
 package org.hathitrust.htrc.tools.scala.implicits
 
-import scala.concurrent.{ExecutionContext, Future}
 import scala.util.{Either, Failure, Left, Right, Success, Try}
 
 object GeneralImplicits {
@@ -27,16 +26,4 @@ object GeneralImplicits {
       case Failure(err) => Left(err)
     }
   }
-
-  implicit class OptionFutureEx[T](of: Option[Future[T]]) {
-    /**
-      * Converts a Option[ Future[T] ] into a Future[ Option[T] ]
-      * @return
-      */
-    def toFutureOption(implicit ec: ExecutionContext): Future[Option[T]] = of match {
-      case Some(f) => f.map(Some(_))
-      case None => Future.successful(None)
-    }
-  }
-
 }

@@ -66,6 +66,7 @@ object StringsImplicits {
       Iterator.continually(st).takeWhile(_.hasMoreTokens).map(_.nextToken())
     }
 
+    def takeRightWhile(p: Char => Boolean): String = s.drop(s.lastIndexWhere(!p(_)) + 1)
   }
 
 }

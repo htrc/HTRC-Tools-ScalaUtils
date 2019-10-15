@@ -76,6 +76,10 @@ object CollectionsImplicits {
     }
   }
 
+  implicit class SeqLikeWithTakeRightWhile[A, C[X] <: SeqLike[X, C[X]]](s: C[A]) {
+    def takeRightWhile(p: (A) => Boolean): C[A] = s.drop(s.lastIndexWhere(!p(_)) + 1)
+  }
+
   implicit class IterableWithGroupConsecutiveWhen[A: ClassTag, C[X] <: IterableLike[X, C[X]]](s: C[A]) {
 
     import org.hathitrust.htrc.tools.scala.collections.RewindableIterator
