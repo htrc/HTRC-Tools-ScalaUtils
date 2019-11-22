@@ -3,9 +3,11 @@ package org.hathitrust.htrc.tools.scala.io
 import java.io.{File, InputStream, OutputStream}
 import java.nio.file.attribute.FileAttribute
 import java.nio.file.{Files, Path, Paths, StandardOpenOption}
+import java.util.Scanner
 
 import scala.language.reflectiveCalls
 import scala.util.Try
+import scala.util.matching.Regex
 
 object IOUtils {
   val OSTmpDir: String = System.getProperty("java.io.tmpdir")
@@ -34,7 +36,7 @@ object IOUtils {
     * Manages the automated closing of resources
     *
     * @param closeable The closeable resource to manage
-    * @param f Code block to execute once the resource is available
+    * @param f         Code block to execute once the resource is available
     * @tparam A Code block return type
     * @tparam B Managed resource type
     * @return The result of applying the code block to the resource
@@ -77,4 +79,6 @@ object IOUtils {
     tmpFile
   }
 
+  def readLinesWithDelimiters(scanner: Scanner, delimiters: Regex = """.*\R|.+\z""".r): Iterator[String] =
+    Iterator.continually(scanner.findWithinHorizon(delimiters.pattern, 0)).takeWhile(_ != null)
 }
