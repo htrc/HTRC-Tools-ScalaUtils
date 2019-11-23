@@ -12,8 +12,8 @@ import scala.collection.AbstractIterator
   *                           expression, so take care to escape things if necessary)
   */
 class EndOfLineDehyphenator(lines: Iterator[String], allowedHyphenChars: String = "-‐‑‒–―−") extends AbstractIterator[String] {
-  private val hyphenLeftRegex = raw"""((?:^|.*\s)[^$allowedHyphenChars\s]+\p{L})[$allowedHyphenChars]$$""".r
-  private val hyphenRightRegex = raw"""^(\p{L}[^$allowedHyphenChars\s]+)(\s+|$$)""".r
+  private val hyphenLeftRegex = raw"""((?:^|.*\s)[^$allowedHyphenChars\s]+\p{L})[$allowedHyphenChars](\R?)$$""".r
+  private val hyphenRightRegex = raw"""^(\p{L}[^$allowedHyphenChars\s]+)(?:(\h+)|$$)""".r
   private val linePairs = lines.sliding(2)
   @SuppressWarnings(Array("org.wartremover.warts.Var"))
   private var lastLine = Option.empty[String]
@@ -29,14 +29,23 @@ class EndOfLineDehyphenator(lines: Iterator[String], allowedHyphenChars: String 
     * @return A `Some` containing the resulting lines after dehyphenation was performed, or `None` if
     *         no dehyphenation was necessary
     */
+  @SuppressWarnings(Array("org.wartremover.warts.Var"))
   protected def dehyphenate(l1: String, l2: String): Option[(String, String)] = {
-    hyphenLeftRegex.findFirstMatchIn(l1).map(_.group(1)) match {
+    hyphenLeftRegex.findFirstMatchIn(l1).map(m => m.group(1) -> m.group(2)) match {
       case None => None
-      case Some(left) =>
-        hyphenRightRegex.findFirstMatchIn(l2).map(m => m.group(1) -> m.group(2).length) match {
+      case Some((left, l1Eol)) =>
+        hyphenRightRegex.findFirstMatchIn(l2).map(m => m.group(1) -> m.group(2)) match {
           case None => None
-          case Some((right, numSpaces)) =>
-            Some((left concat right, l2.substring(right.length + numSpaces)))
+          case Some((right, spaces)) =>
+            val numSpaces = if (spaces == null) 0 else spaces.length
+            var eol = l1Eol
+            var str = l2.substring(right.length + numSpaces)
+            if (str.isEmpty || str.matches("""\R""")) {
+              eol = str
+              str = ""
+            }
+
+            Some((left concat right concat eol, str))
         }
     }
   }
