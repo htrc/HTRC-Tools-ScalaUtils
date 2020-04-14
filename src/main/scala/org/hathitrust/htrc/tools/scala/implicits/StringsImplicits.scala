@@ -67,6 +67,17 @@ object StringsImplicits {
     }
 
     def takeRightWhile(p: Char => Boolean): String = s.drop(s.lastIndexWhere(!p(_)) + 1)
+
+    /**
+      * Returns a new string built by taking every n'th character of the original string
+      *
+      * @param n The skip value
+      * @return A new string built by taking every n'th character of the original string
+      */
+    def takeEvery(n: Int): String = {
+      require(n >= 0)
+      (0 until s.length by n).map(s.charAt).mkString
+    }
   }
 
 }
