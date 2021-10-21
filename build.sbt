@@ -32,7 +32,7 @@ lazy val commonSettings = Seq(
     else
       Some("HTRC Releases Repository"  at nexus + "repository/releases")
   },
-  wartremoverErrors ++= Warts.unsafe.diff(Seq(
+  Compile / compile / wartremoverErrors ++= Warts.unsafe.diff(Seq(
     Wart.DefaultArguments,
     Wart.NonUnitStatements,
     Wart.StringPlusAny
