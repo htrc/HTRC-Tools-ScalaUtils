@@ -28,8 +28,6 @@ class PowerSet[A: ClassTag](elements: Iterable[A]) extends Iterable[Iterable[A]]
 
   override def isEmpty: Boolean = false
 
-  override def nonEmpty: Boolean = true
-
   override def equals(obj: scala.Any): Boolean = obj match {
     case other: PowerSet[A] => elementsMap.equals(other.elementsMap)
     case _ => super.equals(obj)
