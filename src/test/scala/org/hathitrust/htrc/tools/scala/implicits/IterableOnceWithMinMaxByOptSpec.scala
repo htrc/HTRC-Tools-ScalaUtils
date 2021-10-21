@@ -1,10 +1,13 @@
 package org.hathitrust.htrc.tools.scala.implicits
 import org.hathitrust.htrc.tools.scala.implicits.CollectionsImplicits._
-import org.scalatest.{FlatSpec, Matchers, ParallelTestExecution}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should
+import org.scalatest.ParallelTestExecution
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 @SuppressWarnings(Array("org.wartremover.warts.TraversableOps"))
-class TraversableOnceExSpec extends FlatSpec with ScalaCheckPropertyChecks with Matchers with ParallelTestExecution {
+class IterableOnceWithMinMaxByOptSpec extends AnyFlatSpec
+  with ScalaCheckPropertyChecks with should.Matchers with ParallelTestExecution {
 
   "maxByOpt" should "work like maxBy for non-empty collections" in {
     forAll { l: List[Int] =>

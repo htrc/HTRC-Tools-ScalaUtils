@@ -20,14 +20,14 @@ object IOUtils {
     * @param skipHidden True to skip hidden files, False to include them
     * @return The stream of discovered files
     */
-  @SuppressWarnings(Array("org.wartremover.warts.Null"))
-  def recurseFileTree(root: File, skipHidden: Boolean = false): Stream[File] = {
+  @SuppressWarnings(Array("org.wartremover.warts.Null", "org.wartremover.warts.Any"))
+  def recurseFileTree(root: File, skipHidden: Boolean = false): LazyList[File] = {
     if (!root.exists || (skipHidden && root.isHidden)) {
-      Stream.empty
+      LazyList.empty
     } else {
       root #:: (root.listFiles match {
-        case null => Stream.empty
-        case files => files.toStream.flatMap(recurseFileTree(_, skipHidden))
+        case null => LazyList.empty
+        case files => files.to(LazyList).flatMap(recurseFileTree(_, skipHidden))
       })
     }
   }
