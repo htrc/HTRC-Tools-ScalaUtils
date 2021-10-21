@@ -5,9 +5,9 @@ import java.util.Properties
 import javax.xml.transform.dom.DOMSource
 import javax.xml.transform.stream.StreamResult
 import javax.xml.transform.{OutputKeys, TransformerFactory}
-
 import org.w3c.dom.Document
 
+import scala.collection.AbstractIterator
 import scala.io.Codec
 
 object XmlImplicits {
@@ -16,11 +16,27 @@ object XmlImplicits {
 
   import scala.language.implicitConversions
 
-  implicit def nodeList2Traversable(nodeList: NodeList): Traversable[Node] = new Traversable[Node] {
+  implicit def nodeList2Iterable(nodeList: NodeList): Iterable[Node] = new collection.Iterable[Node] {
+
     override def foreach[A](process: Node => A): Unit = {
       for (i <- 0 until nodeList.getLength) {
         process(nodeList.item(i))
       }
+    }
+
+    @SuppressWarnings(Array("org.wartremover.warts.Var"))
+    override def iterator: Iterator[Node] = new AbstractIterator[Node] {
+      private var index = 0
+      private val numNodes = nodeList.getLength
+
+      override def hasNext: Boolean = index < numNodes
+
+      override def next(): Node =
+        if (hasNext) {
+          val node = nodeList.item(index)
+          index += 1
+          node
+        } else Iterator.empty[Node].next()
     }
   }
 
@@ -36,7 +52,7 @@ object XmlImplicits {
       val tf = TransformerFactory.newInstance()
 
       val transformer = tf.newTransformer()
-      outputProperties.foreach(transformer.setOutputProperties(_))
+      outputProperties.foreach(transformer.setOutputProperties)
 
       transformer.transform(new DOMSource(document), new StreamResult(outputStream))
     }
@@ -74,7 +90,7 @@ object XmlImplicits {
       val tf = TransformerFactory.newInstance()
 
       val transformer = tf.newTransformer()
-      outputProperties.foreach(transformer.setOutputProperties(_))
+      outputProperties.foreach(transformer.setOutputProperties)
 
       transformer.transform(new DOMSource(document), new StreamResult(writer))
     }

@@ -1,6 +1,7 @@
 package org.hathitrust.htrc.tools.scala.collections
 
 import scala.collection.AbstractIterator
+import scala.collection.immutable.ArraySeq
 
 /**
   * Dehyphenates a set of lines of text (i.e. joins end-of-line hyphenated words)
@@ -56,7 +57,7 @@ class EndOfLineDehyphenator(lines: Iterator[String], allowedHyphenChars: String 
   override def next(): String = {
     if (linePairs.hasNext) {
       linePairs.next() match {
-        case _l1 :: _l2 :: Nil =>
+        case Seq(_l1, _l2) =>
           var l1 = lastLine.getOrElse(_l1)
           dehyphenate(l1, _l2) match {
             case Some((l1_, l2_)) =>
@@ -73,7 +74,7 @@ class EndOfLineDehyphenator(lines: Iterator[String], allowedHyphenChars: String 
 
           l1
 
-        case l1 :: Nil => l1
+        case Seq(l1) => l1
 
         case _ => throw new RuntimeException("SHOULD NOT HAPPEN")
       }
