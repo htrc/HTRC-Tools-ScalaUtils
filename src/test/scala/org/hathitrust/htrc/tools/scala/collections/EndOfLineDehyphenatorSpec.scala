@@ -25,7 +25,7 @@ class EndOfLineDehyphenatorSpec extends AnyFlatSpec
   }
 
   it should "work when invoked on an iterable" in {
-    val lines = Source.fromString(text).getLines().toSeq
+    val lines = Source.fromString(text).getLines()
     val dehyphenated = lines.dehyphenate()
 
     dehyphenated.toList should contain theSameElementsInOrderAs Source.fromString(expected).getLines().toList

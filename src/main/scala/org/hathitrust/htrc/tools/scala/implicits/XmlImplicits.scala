@@ -36,7 +36,7 @@ object XmlImplicits {
           val node = nodeList.item(index)
           index += 1
           node
-        } else Iterator.empty[Node].next()
+        } else Iterator.empty.next()
     }
   }
 

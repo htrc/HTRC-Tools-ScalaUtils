@@ -25,14 +25,14 @@ object CollectionsImplicits {
       * @param p The predicate indicating the grouping condition.
       * @return An iterator containing the sequences of grouped elements
       */
-    def groupConsecutiveWhen[T](p: (A, A) => Boolean)
-                               (implicit factory: Factory[A, T]): Iterator[T] = new AbstractIterator[T] {
+    def groupConsecutiveWhen[C[X]](p: (A, A) => Boolean)
+                               (implicit factory: Factory[A, C[A]]): Iterator[C[A]] = new AbstractIterator[C[A]] {
       private val (it1, it2) = s.duplicate
       private val ritr = new RewindableIterator(it1, 1)
 
       override def hasNext: Boolean = it2.hasNext
 
-      override def next(): T = {
+      override def next(): C[A] = {
         val count = (ritr.rewind().sliding(2) takeWhile {
           case collection.Seq(a1, a2) => p(a1, a2)
           case _ => false
@@ -108,7 +108,7 @@ object CollectionsImplicits {
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     def isMonotonic(cmp: (A, A) => Boolean): Boolean =
       seq.sliding(2).forall {
-        case x::y::Nil => cmp(x, y)
+        case x :: y :: Nil => cmp(x, y)
         case _ => true
       }
   }
@@ -185,7 +185,7 @@ object CollectionsImplicits {
     /**
       * Same as `maxBy` but guards against using maxBy on an empty collection
       *
-      * @param f The measuring function
+      * @param f   The measuring function
       * @param cmp An ordering used when comparing elements
       * @tparam B The result type of the function f
       * @return An Option containing the first element of this collection or iterator with the largest value
@@ -199,7 +199,7 @@ object CollectionsImplicits {
     /**
       * Same as `minBy` but guards against using minBy on an empty collection
       *
-      * @param f The measuring function
+      * @param f   The measuring function
       * @param cmp An ordering used when comparing elements
       * @tparam B The result type of the function f
       * @return An Option containing the first element of this collection or iterator with the smallest value

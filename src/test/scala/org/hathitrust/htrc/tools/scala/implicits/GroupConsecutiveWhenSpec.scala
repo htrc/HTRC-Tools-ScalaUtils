@@ -11,7 +11,7 @@ class GroupConsecutiveWhenSpec extends AnyFlatSpec
 
   "IteratorGroupConsecutiveWhen" should "group consecutive iterator elements according to the predicate" in {
     val iterator = List(0,3,6,7,8,9,14,18,19,24,29,31,35,36,37,38,41).iterator
-    val grouped = iterator.groupConsecutiveWhen[List[Int]]((a, b) => b-a == 1)
+    val grouped = iterator.groupConsecutiveWhen[List]((a, b) => b-a == 1)
 
     grouped.toList should contain theSameElementsInOrderAs List(
       List(0),

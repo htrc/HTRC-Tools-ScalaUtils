@@ -1,5 +1,7 @@
 package org.hathitrust.htrc.tools.scala.implicits
 
+import scala.collection.compat.immutable._
+
 object SqlImplicits {
 
   import java.sql.{Connection, Statement}

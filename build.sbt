@@ -39,8 +39,7 @@ lazy val commonSettings = Seq(
   )),
   // force to run 'test' before 'package' and 'publish' tasks
   publish := (publish dependsOn Test / test).value,
-  Keys.`package` := (Compile / Keys.`package` dependsOn Test / test).value,
-  Test / run / fork := false
+  Keys.`package` := (Compile / Keys.`package` dependsOn Test / test).value
 )
 
 lazy val `scala-utils` = (project in file("."))
@@ -52,9 +51,10 @@ lazy val `scala-utils` = (project in file("."))
       "A set of utility functions and routines that reduce the boilerplate needed " +
       "to accomplish some common tasks in Scala.",
     libraryDependencies ++= Seq(
-      "org.scalacheck"    %% "scalacheck"      % "1.15.4"  % Test,
-      "org.scalatest"     %% "scalatest"       % "3.2.10"  % Test,
-      "org.scalatestplus" %% "scalacheck-1-15" % "3.2.9.0" % Test
+      "org.scala-lang.modules"  %% "scala-collection-compat"  % "2.5.0",
+      "org.scalacheck"          %% "scalacheck"               % "1.15.4"  % Test,
+      "org.scalatest"           %% "scalatest"                % "3.2.10"  % Test,
+      "org.scalatestplus"       %% "scalacheck-1-15"          % "3.2.9.0" % Test
     ),
     crossScalaVersions := Seq("2.13.6", "2.12.15")
   )

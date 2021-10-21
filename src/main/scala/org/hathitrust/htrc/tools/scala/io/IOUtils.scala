@@ -1,5 +1,7 @@
 package org.hathitrust.htrc.tools.scala.io
 
+import scala.collection.compat.immutable._
+
 import java.io.{File, InputStream, OutputStream}
 import java.nio.file.attribute.FileAttribute
 import java.nio.file.{Files, Path, Paths, StandardOpenOption}
