@@ -56,7 +56,8 @@ lazy val ammoniteSettings = Seq(
     IO.write(file, """object amm extends App { ammonite.Main.main(args) }""")
     Seq(file)
   }.taskValue,
-  Test / run / fork := false
+  connectInput := true,
+  outputStrategy := Some(StdoutOutput)
 )
 
 lazy val `scala-utils` = (project in file("."))
