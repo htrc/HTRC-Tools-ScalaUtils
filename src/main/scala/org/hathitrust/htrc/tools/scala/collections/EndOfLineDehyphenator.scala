@@ -1,7 +1,6 @@
 package org.hathitrust.htrc.tools.scala.collections
 
 import scala.collection.AbstractIterator
-import scala.collection.immutable.ArraySeq
 
 /**
   * Dehyphenates a set of lines of text (i.e. joins end-of-line hyphenated words)
