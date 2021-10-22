@@ -34,7 +34,7 @@ object StringsImplicits {
       * @return The quoted string
       */
     def quoted(quoteChar: Char = '"'): String = {
-      val s2 = s.replaceAllLiterally(quoteChar.toString, """\""" + quoteChar.toString)
+      val s2 = s.replace(quoteChar.toString, """\""" + quoteChar.toString)
       s"$quoteChar$s2$quoteChar"
     }
 

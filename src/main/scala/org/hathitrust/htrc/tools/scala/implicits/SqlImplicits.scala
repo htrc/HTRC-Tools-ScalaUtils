@@ -1,5 +1,7 @@
 package org.hathitrust.htrc.tools.scala.implicits
 
+import scala.collection.compat.immutable._
+
 object SqlImplicits {
 
   import java.sql.{Connection, Statement}
@@ -42,16 +44,16 @@ object RichSQL {
 
   import scala.annotation.tailrec
 
-  private def strm[X](f: RichResultSet => X, rs: ResultSet): Stream[X] = {
+  private def strm[X](f: RichResultSet => X, rs: ResultSet): LazyList[X] = {
     if (rs.next) {
-      Stream.cons(f(new RichResultSet(rs)), strm(f, rs))
+      LazyList.cons(f(new RichResultSet(rs)), strm(f, rs))
     } else {
       rs.close()
-      Stream.empty
+      LazyList.empty
     }
   }
 
-  implicit def query[X](s: String, f: RichResultSet => X)(implicit stat: Statement): Stream[X] = {
+  implicit def query[X](s: String, f: RichResultSet => X)(implicit stat: Statement): LazyList[X] = {
     strm(f, stat.executeQuery(s))
   }
 
@@ -210,9 +212,9 @@ object RichSQL {
   class RichPreparedStatement(val ps: PreparedStatement) {
     private var pos = 1
 
-    def <<![X](f: RichResultSet => X): Stream[X] = execute(f)
+    def <<![X](f: RichResultSet => X): LazyList[X] = execute(f)
 
-    def execute[X](f: RichResultSet => X): Stream[X] = {
+    def execute[X](f: RichResultSet => X): LazyList[X] = {
       pos = 1
       strm(f, ps.executeQuery)
     }

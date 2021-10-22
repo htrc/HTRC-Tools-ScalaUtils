@@ -2,9 +2,8 @@ package org.hathitrust.htrc.tools.scala.implicits
 
 import org.hathitrust.htrc.tools.scala.collections.{EndOfLineDehyphenator, PowerSet}
 
-import scala.collection.generic.CanBuildFrom
-import scala.collection.{AbstractIterator, IterableLike, SeqLike}
-import scala.language.higherKinds
+import scala.collection.generic.IsSeq
+import scala.collection.{AbstractIterator, Factory, SeqOps}
 import scala.reflect.ClassTag
 
 object CollectionsImplicits {
@@ -18,7 +17,7 @@ object CollectionsImplicits {
     def powerSet: PowerSet[A] = new PowerSet[A](it)
   }
 
-  implicit class IteratorWithGroupConsecutiveWhen[+A: ClassTag](s: Iterator[A]) {
+  implicit class IteratorWithGroupConsecutiveWhen[A: ClassTag](s: Iterator[A]) {
     import org.hathitrust.htrc.tools.scala.collections.RewindableIterator
 
     /**
@@ -27,24 +26,25 @@ object CollectionsImplicits {
       * @param p The predicate indicating the grouping condition.
       * @return An iterator containing the sequences of grouped elements
       */
-    def groupConsecutiveWhen(p: (A, A) => Boolean): Iterator[List[A]] = new AbstractIterator[List[A]] {
+    def groupConsecutiveWhen[C[X]](p: (A, A) => Boolean)
+                               (implicit factory: Factory[A, C[A]]): Iterator[C[A]] = new AbstractIterator[C[A]] {
       private val (it1, it2) = s.duplicate
       private val ritr = new RewindableIterator(it1, 1)
 
       override def hasNext: Boolean = it2.hasNext
 
-      override def next(): List[A] = {
+      override def next(): C[A] = {
         val count = (ritr.rewind().sliding(2) takeWhile {
-          case Seq(a1, a2) => p(a1, a2)
+          case collection.Seq(a1, a2) => p(a1, a2)
           case _ => false
         }).length
 
-        (it2 take (count + 1)).toList
+        (it2 take (count + 1)).to(factory)
       }
     }
   }
 
-  implicit class IteratorWithDehyphenate(s: Iterator[String]) {
+  implicit class StringIteratorWithDehyphenate(s: Iterator[String]) {
     /**
       * Dehyphenates a set of lines of text (i.e. joins end-of-line hyphenated words)
       * Loosely follows the rules specified at http://englishplus.com/grammar/00000129.htm
@@ -58,7 +58,7 @@ object CollectionsImplicits {
       new EndOfLineDehyphenator(s, allowedHyphenChars)
   }
 
-  implicit class SeqWithDehyphenate[C <: SeqLike[String, C]](s: C) {
+  implicit class StringSeqWithDehyphenate[C <: collection.Seq[String]](s: C) {
     /**
       * Dehyphenates a set of lines of text (i.e. joins end-of-line hyphenated words)
       * Loosely follows the rules specified at http://englishplus.com/grammar/00000129.htm
@@ -69,55 +69,19 @@ object CollectionsImplicits {
       * @return The dehyphenated lines
       */
     def dehyphenate(allowedHyphenChars: String = "-‐‑‒–―−")
-                   (implicit cbf: CanBuildFrom[C, String, C]): C = {
-      val bf = cbf(s)
-      for (x <- new EndOfLineDehyphenator(s.iterator, allowedHyphenChars)) bf += x
-      bf.result()
+                   (implicit factory: Factory[String, C]): C = {
+      new EndOfLineDehyphenator(s.iterator, allowedHyphenChars).to(factory)
     }
   }
 
-  implicit class SeqLikeWithTakeRightWhile[A, C[X] <: SeqLike[X, C[X]]](s: C[A]) {
-    def takeRightWhile(p: (A) => Boolean): C[A] = s.drop(s.lastIndexWhere(!p(_)) + 1)
+  final class SeqOpsWithTakeRightWhile[A, C](private val coll: SeqOps[A, Iterable, C]) extends AnyVal {
+    def takeRightWhile(p: A => Boolean): C = coll.drop(coll.lastIndexWhere(!p(_)) + 1)
   }
 
-  implicit class IterableWithGroupConsecutiveWhen[A: ClassTag, C[X] <: IterableLike[X, C[X]]](s: C[A]) {
+  implicit def SeqOpsWithTakeRightWhile[Repr](coll: Repr)(implicit it: IsSeq[Repr]): SeqOpsWithTakeRightWhile[it.A, it.C] =
+    new SeqOpsWithTakeRightWhile(it(coll))
 
-    import org.hathitrust.htrc.tools.scala.collections.RewindableIterator
-
-    /**
-      * Groups consecutive elements that match the given predicate.
-      *
-      * @param p The predicate indicating the grouping condition.
-      * @return An `IterableLike` containing the sequences of grouped elements
-      */
-    def groupConsecutiveWhen(p: (A, A) => Boolean)
-                            (implicit cbf: CanBuildFrom[C[A], List[A], C[List[A]]]): C[List[A]] = {
-      val it: AbstractIterator[List[A]] = new AbstractIterator[List[A]] {
-        private val it1 = s.iterator
-        private val it2 = s.iterator
-        private val ritr = new RewindableIterator(it1, 1)
-
-        override def hasNext: Boolean = it2.hasNext
-
-        override def next(): List[A] = {
-          val count = (ritr.rewind().sliding(2) takeWhile {
-            case Seq(a1, a2) => p(a1, a2)
-            case _ => false
-          }).length
-
-          (it2 take (count + 1)).toList
-        }
-      }
-
-      val bf = cbf(s)
-      while (it.hasNext)
-        bf += it.next()
-
-      bf.result()
-    }
-  }
-
-  implicit class SeqWithPowerSet[+A](s: Seq[A]) {
+  implicit class SeqWithPowerSet[+A](s: collection.Seq[A]) {
 
     /**
       * Constructs the power set of a sequence of elements, including only those
@@ -127,9 +91,9 @@ object CollectionsImplicits {
       * @return The power set
       */
     @SuppressWarnings(Array("org.wartremover.warts.TraversableOps"))
-    def powerSetWithExclusiveFilter(p: Seq[A] => Boolean): List[List[A]] = {
+    def powerSetWithExclusiveFilter(p: collection.Seq[A] => Boolean): List[List[A]] = {
       @annotation.tailrec
-      def pwr(s: Seq[A], acc: List[List[A]]): List[List[A]] =
+      def pwr(s: collection.Seq[A], acc: List[List[A]]): List[List[A]] =
         if (s.isEmpty) acc
         else pwr(s.tail, acc ++ acc.map(_ :+ s.head).filter(p))
 
@@ -138,7 +102,7 @@ object CollectionsImplicits {
 
   }
 
-  implicit class SeqWithIsIncreasing[A](seq: Seq[A]) {
+  implicit class SeqWithIsMonotonic[A](seq: collection.Seq[A]) {
     /**
       * Checks whether the elements of a sequence are in monotonic order.
       *
@@ -148,12 +112,12 @@ object CollectionsImplicits {
     @SuppressWarnings(Array("org.wartremover.warts.Var"))
     def isMonotonic(cmp: (A, A) => Boolean): Boolean =
       seq.sliding(2).forall {
-        case x::y::Nil => cmp(x, y)
+        case x :: y :: Nil => cmp(x, y)
         case _ => true
       }
   }
 
-  implicit class SeqWithLevenshtein[-A](s0: Seq[A]) {
+  implicit class SeqWithLevenshtein[-A](s0: collection.Seq[A]) {
     /**
       * Returns the Levenshtein distance between two element sequences.
       *
@@ -161,7 +125,7 @@ object CollectionsImplicits {
       * @return The Levenshtein distance
       */
     @SuppressWarnings(Array("org.wartremover.warts.Return", "org.wartremover.warts.Var"))
-    def levenshteinScore(s1: Seq[A]): Double = {
+    def levenshteinScore(s1: collection.Seq[A]): Double = {
       if (s0 == s1) return 0
 
       val len0 = s0.size
@@ -204,19 +168,6 @@ object CollectionsImplicits {
     }
   }
 
-  implicit class TraversableOnceToSortedMap[A, B](tuples: TraversableOnce[(A, B)])
-    (implicit ordering: Ordering[A]) {
-
-    import scala.collection.immutable.SortedMap
-
-    /**
-      * Converts a TraversableOnce to SortedMap.
-      *
-      * @return The SortedMap
-      */
-    def toSortedMap: SortedMap[A, B] = SortedMap(tuples.toSeq: _*)
-  }
-
   implicit class IterableWithAvg[T: Numeric](data: Iterable[T]) {
     private val numeric = implicitly[Numeric[T]]
 
@@ -234,33 +185,33 @@ object CollectionsImplicits {
     }
   }
 
-  implicit class TraversableOnceEx[A](t: TraversableOnce[A]) {
+  implicit class IterableOnceWithMinMaxByOpt[A](t: IterableOnce[A]) {
     /**
       * Same as `maxBy` but guards against using maxBy on an empty collection
       *
-      * @param f The measuring function
+      * @param f   The measuring function
       * @param cmp An ordering used when comparing elements
       * @tparam B The result type of the function f
       * @return An Option containing the first element of this collection or iterator with the largest value
       *         measured by function f with respect to the ordering cmp, or None if this collection or iterator is empty
       */
     def maxByOpt[B](f: A => B)(implicit cmp: Ordering[B]): Option[A] = t match {
-      case _ if t.isEmpty => None
-      case _ => Some(t.maxBy(f)(cmp))
+      case _ if t.iterator.isEmpty => None
+      case _ => Some(t.iterator.maxBy(f)(cmp))
     }
 
     /**
       * Same as `minBy` but guards against using minBy on an empty collection
       *
-      * @param f The measuring function
+      * @param f   The measuring function
       * @param cmp An ordering used when comparing elements
       * @tparam B The result type of the function f
       * @return An Option containing the first element of this collection or iterator with the smallest value
       *         measured by function f with respect to the ordering cmp, or None if this collection or iterator is empty
       */
     def minByOpt[B](f: A => B)(implicit cmp: Ordering[B]): Option[A] = t match {
-      case _ if t.isEmpty => None
-      case _ => Some(t.minBy(f)(cmp))
+      case _ if t.iterator.isEmpty => None
+      case _ => Some(t.iterator.minBy(f)(cmp))
     }
   }
 }

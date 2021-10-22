@@ -2,14 +2,15 @@ package org.hathitrust.htrc.tools.scala.collections
 
 import org.scalacheck.Arbitrary.arbitrary
 import org.scalacheck._
-import org.scalatest.{FlatSpec, Matchers}
+import org.scalatest.flatspec.AnyFlatSpec
+import org.scalatest.matchers.should
 import org.scalatestplus.scalacheck.ScalaCheckPropertyChecks
 
 import scala.util.Random
 
 @SuppressWarnings(Array("org.wartremover.warts.Var"))
-class RewindableIteratorSpec extends FlatSpec
-  with ScalaCheckPropertyChecks with Matchers {
+class RewindableIteratorSpec extends AnyFlatSpec
+  with ScalaCheckPropertyChecks with should.Matchers {
 
   def consume[T](it: Iterator[T], n: Int): List[T] =
     Iterator.range(0, n).map(_ => it.next()).toList
@@ -35,16 +36,16 @@ class RewindableIteratorSpec extends FlatSpec
   }
 
   it should "correctly return all memoized elements when rewound" in {
-    var genData = for {
+    val genData = for {
       lst <- arbitrary[List[Int]]
       n <- Gen.choose(0, lst.size)
     } yield (lst, n)
 
-    // to fix shrinking issue not respecting the original generator constraint of m <= n
-    // see https://gist.github.com/davidallsopp/f65d73fea8b5e5165fc3
-    genData = genData suchThat {
-      case (lst, n) => n <= lst.size
-    }
+//    // to fix shrinking issue not respecting the original generator constraint of m <= n
+//    // see https://gist.github.com/davidallsopp/f65d73fea8b5e5165fc3
+//    genData = genData suchThat {
+//      case (lst, n) => n <= lst.size
+//    }
 
     forAll(genData) { case (lst, n) =>
       val it = lst.iterator
@@ -56,16 +57,16 @@ class RewindableIteratorSpec extends FlatSpec
   }
 
   it should "correctly return selected memoized elements when rewound" in {
-    var genData = for {
+    val genData = for {
       n <- Gen.choose(0, 1000)
       m <- Gen.choose(0, n)
     } yield (n, m)
 
-    // to fix shrinking issue not respecting the original generator constraint of m <= n
-    // see https://gist.github.com/davidallsopp/f65d73fea8b5e5165fc3
-    genData = genData suchThat {
-      case (n, m) => m <= n
-    }
+//    // to fix shrinking issue not respecting the original generator constraint of m <= n
+//    // see https://gist.github.com/davidallsopp/f65d73fea8b5e5165fc3
+//    genData = genData suchThat {
+//      case (n, m) => m <= n
+//    }
 
     forAll(genData) { case (n, m) =>
       val it = Iterator.continually(Random.nextInt())
