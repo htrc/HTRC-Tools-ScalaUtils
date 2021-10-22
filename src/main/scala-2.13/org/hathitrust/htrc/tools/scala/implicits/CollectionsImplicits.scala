@@ -2,6 +2,7 @@ package org.hathitrust.htrc.tools.scala.implicits
 
 import org.hathitrust.htrc.tools.scala.collections.{EndOfLineDehyphenator, PowerSet}
 
+import scala.collection.generic.IsSeq
 import scala.collection.{AbstractIterator, Factory, SeqOps}
 import scala.reflect.ClassTag
 
@@ -73,9 +74,12 @@ object CollectionsImplicits {
     }
   }
 
-  implicit class SeqOpsWithTakeRightWhile[A, C[X] <: SeqOps[X, collection.Seq, C[X]]](s: C[A]) {
-    def takeRightWhile(p: A => Boolean): C[A] = s.drop(s.lastIndexWhere(!p(_)) + 1)
+  final class SeqOpsWithTakeRightWhile[A, C](private val coll: SeqOps[A, Iterable, C]) extends AnyVal {
+    def takeRightWhile(p: A => Boolean): C = coll.drop(coll.lastIndexWhere(!p(_)) + 1)
   }
+
+  implicit def SeqOpsWithTakeRightWhile[Repr](coll: Repr)(implicit it: IsSeq[Repr]): SeqOpsWithTakeRightWhile[it.A, it.C] =
+    new SeqOpsWithTakeRightWhile(it(coll))
 
   implicit class SeqWithPowerSet[+A](s: collection.Seq[A]) {
 
