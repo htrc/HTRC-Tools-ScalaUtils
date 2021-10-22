@@ -75,5 +75,6 @@ lazy val `scala-utils` = (project in file("."))
       "org.scalatest"           %% "scalatest"                % "3.2.10"  % Test,
       "org.scalatestplus"       %% "scalacheck-1-15"          % "3.2.9.0" % Test
     ),
+    ThisBuild / versionScheme := Some("semver-spec"),
     crossScalaVersions := Seq("2.13.6", "2.12.15")
   )
