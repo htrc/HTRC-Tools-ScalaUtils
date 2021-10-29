@@ -1,14 +1,12 @@
 package org.hathitrust.htrc.tools.scala.io
 
 import scala.collection.compat.immutable._
-
 import java.io.{File, InputStream, OutputStream}
 import java.nio.file.attribute.FileAttribute
 import java.nio.file.{Files, Path, Paths, StandardOpenOption}
 import java.util.Scanner
-
 import scala.language.reflectiveCalls
-import scala.util.Try
+import scala.util.{Try, Using}
 import scala.util.matching.Regex
 
 object IOUtils {
@@ -43,6 +41,7 @@ object IOUtils {
     * @tparam B Managed resource type
     * @return The result of applying the code block to the resource
     */
+  @deprecated("Use scala.utils.Using in 2.13 or via scala-collections-compat in 2.12")
   def using[A, B <: {def close() : Unit}](closeable: B)(f: B => A): A =
     try {
       f(closeable)
@@ -74,7 +73,7 @@ object IOUtils {
     val tmpPath = Paths.get(tmpDir)
     val tmpFile = Files.createTempFile(tmpPath, prefix, suffix, fileAttributes: _*)
 
-    using(Files.newOutputStream(tmpFile, StandardOpenOption.WRITE)) { tmpStream =>
+    Using.resource(Files.newOutputStream(tmpFile, StandardOpenOption.WRITE)) { tmpStream =>
       copy(is, tmpStream)
     }
 
