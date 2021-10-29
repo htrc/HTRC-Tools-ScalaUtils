@@ -24,7 +24,18 @@ lazy val commonSettings = Seq(
     ("Git-Version", git.gitDescribedVersion.value.getOrElse("N/A")),
     ("Git-Dirty", git.gitUncommittedChanges.value.toString),
     ("Build-Date", new java.util.Date().toString)
-  ),
+  )
+)
+
+lazy val wartRemoverSettings = Seq(
+  Compile / compile / wartremoverErrors ++= Warts.unsafe.diff(Seq(
+    Wart.DefaultArguments,
+    Wart.NonUnitStatements,
+    Wart.StringPlusAny
+  ))
+)
+
+lazy val publishSettings = Seq(
   publishTo := {
     val nexus = "https://nexus.htrc.illinois.edu/"
     if (isSnapshot.value)
@@ -32,11 +43,6 @@ lazy val commonSettings = Seq(
     else
       Some("HTRC Releases Repository"  at nexus + "repository/releases")
   },
-  Compile / compile / wartremoverErrors ++= Warts.unsafe.diff(Seq(
-    Wart.DefaultArguments,
-    Wart.NonUnitStatements,
-    Wart.StringPlusAny
-  )),
   // force to run 'test' before 'package' and 'publish' tasks
   publish := (publish dependsOn Test / test).value,
   Keys.`package` := (Compile / Keys.`package` dependsOn Test / test).value
@@ -63,6 +69,8 @@ lazy val ammoniteSettings = Seq(
 lazy val `scala-utils` = (project in file("."))
   .enablePlugins(GitVersioning, GitBranchPrompt)
   .settings(commonSettings)
+  .settings(wartRemoverSettings)
+  .settings(publishSettings)
   .settings(ammoniteSettings)
   .settings(
     name := "scala-utils",
