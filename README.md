@@ -14,7 +14,7 @@ needed to accomplish some common tasks in Scala.
 # Usage
 
 ## SBT
-`libraryDependencies += "org.hathitrust.htrc" %% "scala-utils" % "2.13"`
+`libraryDependencies += "org.hathitrust.htrc" %% "scala-utils" % VERSION`
 
 ## Maven
 
@@ -23,7 +23,7 @@ needed to accomplish some common tasks in Scala.
 <dependency>
     <groupId>org.hathitrust.htrc</groupId>
     <artifactId>scala-utils_2.12</artifactId>
-    <version>2.13</version>
+    <version>VERSION</version>
 </dependency>
 ```
 
@@ -32,7 +32,7 @@ needed to accomplish some common tasks in Scala.
 <dependency>
     <groupId>org.hathitrust.htrc</groupId>
     <artifactId>scala-utils_2.13</artifactId>
-    <version>2.13</version>
+    <version>VERSION</version>
 </dependency>
 ```
 
