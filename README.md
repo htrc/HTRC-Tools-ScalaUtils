@@ -1,3 +1,7 @@
+[![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/htrc/HTRC-Tools-ScalaUtils/ci.yml?branch=develop)](https://github.com/htrc/HTRC-Tools-ScalaUtils/actions/workflows/ci.yml)
+[![codecov](https://codecov.io/gh/htrc/HTRC-Tools-ScalaUtils/branch/develop/graph/badge.svg?token=ZFB6X3AKGV)](https://codecov.io/gh/htrc/HTRC-Tools-ScalaUtils)
+[![GitHub release (latest SemVer including pre-releases)](https://img.shields.io/github/v/release/htrc/HTRC-Tools-ScalaUtils?include_prereleases&sort=semver)](https://github.com/htrc/HTRC-Tools-ScalaUtils/releases/latest)
+
 # HTRC-Tools-ScalaUtils
 This library provides a set of implicit transformations and routines that reduce the boilerplate 
 needed to accomplish some common tasks in Scala.
