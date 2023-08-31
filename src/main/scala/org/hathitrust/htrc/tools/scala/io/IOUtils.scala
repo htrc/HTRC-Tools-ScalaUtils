@@ -41,7 +41,7 @@ object IOUtils {
     * @tparam B Managed resource type
     * @return The result of applying the code block to the resource
     */
-  @deprecated("Use scala.utils.Using in 2.13 or via scala-collections-compat in 2.12")
+  @deprecated("Use scala.util.Using in 2.13 or via scala-collections-compat in 2.12")
   def using[A, B <: {def close() : Unit}](closeable: B)(f: B => A): A =
     try {
       f(closeable)
