@@ -4,7 +4,7 @@ inThisBuild(Seq(
   organization := "org.hathitrust.htrc",
   organizationName := "HathiTrust Research Center",
   organizationHomepage := Some(url("https://www.hathitrust.org/htrc")),
-  scalaVersion := "2.13.11",
+  scalaVersion := "2.13.14",
   scalacOptions ++= Seq(
     "-feature",
     "-deprecation",
@@ -25,7 +25,7 @@ inThisBuild(Seq(
   ),
   dynverSonatypeSnapshots := true,
   versionScheme := Some("semver-spec"),
-  crossScalaVersions := Seq("2.13.11", "2.12.18")
+  crossScalaVersions := Seq("2.13.14", "2.12.18")
 ))
 
 lazy val publishSettings = Seq(
@@ -53,7 +53,7 @@ lazy val ammoniteSettings = Seq(
       val version = scalaBinaryVersion.value match {
         case "2.10" => "1.0.3"
         case "2.11" => "1.6.7"
-        case _ ⇒  "2.5.9"
+        case _ ⇒  "3.0.0-M1-24-26133e66"
       }
       "com.lihaoyi" % "ammonite" % version % Test cross CrossVersion.full
     },
@@ -76,9 +76,9 @@ lazy val `scala-utils` = (project in file("."))
       "A set of utility functions and routines that reduce the boilerplate needed " +
       "to accomplish some common tasks in Scala.",
     libraryDependencies ++= Seq(
-      "org.scala-lang.modules"  %% "scala-collection-compat"  % "2.11.0",
-      "org.scalacheck"          %% "scalacheck"               % "1.17.0"    % Test,
-      "org.scalatest"           %% "scalatest"                % "3.2.16"    % Test,
+      "org.scala-lang.modules"  %% "scala-collection-compat"  % "2.12.0",
+      "org.scalacheck"          %% "scalacheck"               % "1.18.0"    % Test,
+      "org.scalatest"           %% "scalatest"                % "3.2.18"    % Test,
       "org.scalatestplus"       %% "scalacheck-1-15"          % "3.2.11.0"  % Test
     ),
   )
